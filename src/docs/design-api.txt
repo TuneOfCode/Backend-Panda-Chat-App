@@ -1,0 +1,107 @@
+** params/query
+    ?search=* -> tìm kiếm
+    ?filer_field=* -> lọc bởi trường trong csdl
+    ?filter_operation=* -> lọc bởi toán tử (=, !=, >, >=, <, <=, like) trong csdl
+    ?filter_value=* -> giá trị được lọc
+    ?page=* -> lấy ra trang hiện tại (mặc định là 1)
+    ?per_page=* -> lấy ra số dòng hiển thị tương ứng trên 1 trang (mặc định là 0)
+    ?sort_field=* -> sắp sếp theo trường trong csdl
+    ?sort_type=* -> sắp xếp tăng dần (asc) hoặc giảm dần (desc)
+
+* Auth:
+    POST /api/auth/signup
+    POST /api/auth/login
+    POST /api/auth/login-google (plus)
+    POST /api/auth/login-facebook (plus)
+    PATCH /api/auth/verify-email
+    POST /api/auth/forgot-password (plus)
+    PATCH /api/auth/send-otp (plus)
+    POST /api/auth/verify-otp (plus)
+    POST /api/auth/logout
+    POST /api/auth/refresh-token
+
+* Users:
+    POST /api/users
+    GET /api/users
+    PUT /api/users/:id
+    PATCH /api/users/:id
+    PATCH /api/users/:id/change-password 
+    PATCH /api/users/:id/upload-avatar
+    DELETE /api/users/:id
+
+* Roles:
+    POST /api/roles
+    GET /api/roles
+    PATCH /api/roles/:id/assign -> gán vai trò cho nhiều người dùng
+    DELETE /api/roles/:id
+
+* Friends:
+- Trạng thái lời mời kết bạn gồm có
+ + pending: đang chờ phản hồi lời mời
+ + accepted: đã chấp nhận lời mời và trở thành bạn bè
+ + rejected: đã từ chối lời mời
+    POST /api/friends -> tạo một lời mời kết bạn (mặc định là pending)
+    GET /api/friends -> lấy ra tất cả lời mời kết bạn của tôi
+    GET /api/friends?type=pending&sender=me -> lấy ra tất cả lời mời kết bạn đang chờ xử lý của    tôi và do tôi gửi (những lời mời kết bạn chưa được phản hồi từ đối phương)
+    GET /api/friends?type=pending&receiver=me -> những lời mời kết bạn chưa được phản hồi của tôi
+    GET /api/friends?type=accepted -> lấy ra tất cả bạn bè của tôi
+    GET /api/friends?type=rejected&sender=me -> lấy ra tất cả lời mời kết bạn do đối phương từ chối
+    GET /api/friends?type=rejected&receiver=me -> lấy ra tất cả lời mời kết bạn do tôi từ chối
+    GET /api/friends/:id -> lấy ra chi tiết một lời mời kết bạn
+    PATCH /api/friends/:id/accept -> đồng ý lời mời kết bạn (status: pending)
+    PATCH /api/friends/:id/reject -> từ chối lời mời kết bạn (status: pending)
+    PATCH /api/friends/:id/unfriend -> huỷ kết bạn (status: accepted)
+    DELETE /api/friends/:id -> xoá lời mời kết bạn (chỉ trạng thái rejected)
+
+* Conversations: (cuộc hội thoại riêng tư hoặc với nhóm)
+** Trường hợp cuộc hội thoại riêng tư:
+- Nếu tôi (sender_id) gửi lời mời kết bạn đến đối phương (receiver_id) và trạng thái đồng ý (bạn bè) thì sẽ tạo ra conversations của chúng tôi là:
+ + name: là tên của đối phương
+ + member_id là đối phương
+ + onwer_id là tôi
+ Khi hiển thị giao diện tên của đoạn hội thoại thì mặc định là name đối với tôi và owner_name giành cho đối phương
+ + Nếu cuộc hội thoại này đã có tin nhắn thì không thêm được người dùng vào mà sẽ tạo ra đoạn hội thoại mới + 2 người dùng này và thêm những người khác (như facebook)
+    POST /api/conversations -> tạo một cuộc hội thoại
+    GET /api/conversations -> lấy ra tất cả cuộc hội thoại của tôi
+    GET /api/conversations?type=private -> lấy ra tất cả cuộc hội thoại riêng tư của tôi
+    GET /api/conversations?type=group -> lấy ra tất cả cuộc hội thoại nhóm của tôi
+    GET /api/conversations?is_hide=true -> lấy ra tất cả cuộc hội thoại bị ẩn của tôi
+    GET /api/conversations/:id -> lấy ra chi tiết một cuộc hội thoại của tôi
+    GET /api/conversations/:id/messages -> lấy ra tất cả tin nhắn trong một cuộc hội thoại của tôi
+    GET /api/conversations/:id/messages/:id/readed -> lấy ra tất cả thành viên đã đọc tin nhắn này
+    GET /api/conversations/:id/messages/:id/no-read -> lấy ra tất cả thành viên chưa đọc tin nhắn này
+    GET /api/conversations/:id/messages?sender=me -> lấy ra các tin nhắn do tôi gửi trong một đoạn hội thoại
+    GET /api/conversations/:id/messages?receiver=me -> lấy ra các tin nhắn tôi được nhận trong một đoạn hội thoại
+    GET /api/conversations/:id/messages?receiver=me&is_readed=false -> lấy ra các tin nhắn tôi được nhận và chưa đọc trong một đoạn hội thoại
+    PATCH /api/conversations/:id -> cập nhật cuộc hội thoại
+    PATCH /api/conversations/:id/add-members -> thêm thành viên vào cuộc hội thoại (owner)
+    PATCH /api/conversations/:id/kick-members -> loại thành viên ra cuộc hội thoại (owner)
+    PATCH /api/conversations/:id/join -> đồng ý tham gia vào cuộc hội thoại
+    PATCH /api/conversations/:id/leave -> rời cuộc hội thoại này
+    PATCH /api/conversations/:id/hide -> ẩn hội thoại này (owner)
+    PATCH /api/conversations/:id/show -> khôi phục hội thoại này (owner)
+    DELETE /api/conversations/:id -> xoá vĩnh viễn cuộc hội thoại
+
+* Messages:
+    POST /api/messages -> tạo mới tin nhắn
+    POST /api/messages/reply -> trả lời tin nhắn trước đó đã gửi
+    GET /api/messages?is_readed=false -> lấy tất cả tin nhắn mà tôi chưa đọc
+    GET /api/messages/:id -> lấy ra một tin nhắn
+    POST /api/messages/:id/read -> đọc một tin nhắn (receiver)
+    PATCH /api/messages/:id/edit -> sửa tin nhắn (sender)
+    PATCH /api/messages/:id/recall -> thu hồi tin nhắn (sender)
+    PATCH /api/messages/:id/restore -> khôi phục tin nhắn (sender)
+    DELETE /api/messages/:id -> xoá vĩnh viễn tin nhắn (sender)
+
+* Notifications:
+    POST /api/notications -> tạo mới thông báo
+    GET /api/notifications -> lấy ra tất cả thông báo
+    GET /api/notifications?is_readed=false -> lấy ra tất cả thông báo mà tôi chưa đọc
+    GET /api/notifications?type=message -> lấy ra tất cả thông báo loại tin nhắn của tôi
+    GET /api/notifications?type=friend_request -> lấy ra tất cả thông báo loại lời mời kết bạn của tôi
+    GET /api/notifications?type=join_group -> lấy ra tất cả thông báo loại lời mời tham gia nhóm của tôi
+    PATCH /api/notifications/read-all -> đọc tất cả thông báo (đánh dấu tất cả đã đọc)
+    PATCH /api/notifications/:id/read -> đọc một thông báo 
+    DELETE /api/notifications -> xoá nhiều thông báo (mảng ids thông báo)
+
+

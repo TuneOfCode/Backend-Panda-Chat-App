@@ -1,0 +1,31 @@
+# baseURL
+@baseURL = http://localhost:3000/api
+
+###
+# User Signup
+POST {{ baseURL }}/auth/signup
+Content-Type: application/json
+
+{
+    "firstName":"Hoàng Thị Ngọc",
+    "lastName":"Yến",
+    "email":"hoangyen180199@gmail.com",
+    "username":"htny",
+    "password":"123456",
+    "confirmPassword":"123456"
+}
+
+###
+# User Login
+POST {{ baseURL }}/auth/login
+Content-Type: application/json
+
+{
+    "username": "kingproup1111@gmail.com",
+    "password": "123456"
+}
+
+###
+# User Logout
+POST {{ baseURL }}/auth/logout
+Content-Type: application/json

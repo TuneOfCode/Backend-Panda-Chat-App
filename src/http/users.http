@@ -1,0 +1,41 @@
+# baseURL
+@baseURL = http://localhost:3000/api
+@userId = 64ee951f655d9564542bb6cb
+
+###
+# Find All Users
+GET {{ baseURL }}/users
+
+###
+# Find User By Id
+GET {{ baseURL }}/users/{{ userId }}
+
+###
+# Create User
+POST {{ baseURL }}/users
+Content-Type: application/json
+
+{
+    "firstName":"Hoàng Thị Ngọc",
+    "lastName":"Yến",
+    "email":"hoangyen180199@gmail.com",
+    "username":"htny",
+    "password":"123456",
+    "confirmPassword":"123456"
+}
+
+###
+# Modify User By Id
+PUT {{ baseURL }}/users/{{ userId }}
+Content-Type: application/json
+
+{
+    "firstName":"Hoàng Thị Ngọc",
+    "lastName":"Yến",
+    "email":"hoangyen180199@gmail.com",
+    "username":"htny"
+}
+
+###
+# Delete User By Id
+DELETE {{ baseURL }}/users/{{ userId }}

@@ -1,0 +1,484 @@
+openapi: 3.0.0
+
+schemes:
+  - https
+  - http
+
+tags:
+  - name: auth
+    description: authenticate API
+  - name: users
+    description: users API
+  - name: roles
+    description: roles API
+  - name: conversations
+    description: conversations API
+  - name: messages
+    description: messages API
+  - name: friends
+    description: friends API
+  - name: notifications
+    description: notifications API
+
+paths:
+  # [POST] auth/signup
+  /api/auth/signup:
+    post:
+      tags:
+        - auth
+      summary: Register a user
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/requestBody/CreateUserDto'
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # [POST] auth/login
+  /api/auth/login:
+    post:
+      tags:
+        - auth
+      summary: Login a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBody/LoginDto'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        500:
+          description: 'Server Error'
+
+  # [POST] auth/logout
+  /api/auth/logout:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - auth
+      summary: Logout a user
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        500:
+          description: 'Server Error'
+
+  # [GET] users
+  /api/users:
+    get:
+      tags:
+        - users
+      summary: Find All Users
+      parameters:
+        - $ref: '#/components/parameters/filter_field'
+        - $ref: '#/components/parameters/filter_operator'
+        - $ref: '#/components/parameters/filter_value'
+        - $ref: '#/components/parameters/sort_field'
+        - $ref: '#/components/parameters/sort_type'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        200:
+          description: 'OK'
+        500:
+          description: 'Server Error'
+
+    # [POST] users
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Add new a user
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/requestBody/CreateUserDto'
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # [GET] users/id
+  /api/users/{id}:
+    get:
+      tags:
+        - users
+      summary: Find User By Id
+      parameters:
+        - name: id
+          in: path
+          description: User Id
+          required: true
+      responses:
+        200:
+          description: 'OK'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+    # [PUT] users/id
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Update User By Id
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/requestBody/UpdateUserDto'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+    # [DELETE] users/id
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Delete User By Id
+      parameters:
+        - name: id
+          in: path
+          description: user Id
+          required: true
+      responses:
+        200:
+          description: 'OK'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+# components
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    # Filter
+    filter_field:
+      in: query
+      name: filter_field
+      type: string
+      description: field to filter in collections
+    filter_operator:
+      in: query
+      name: filter_operator
+      type: string (eq, ne, gt, gte, lt, lte, like)
+      description: operator to filter in collections
+    filter_value:
+      in: query
+      name: filter_value
+      type: string
+      description: value to filter in collections
+    # Sort
+    sort_field:
+      in: query
+      name: sort_field
+      type: string
+      description: field to sort in collections
+    sort_type:
+      in: query
+      name: sort_type
+      type: string (asc, desc)
+      description: type to sort in collections
+    # Paginate
+    page:
+      in: query
+      name: page
+      type: number
+      description: page to paginate in collections
+    per_page:
+      in: query
+      name: per_page
+      type: number
+      description: limit to paginate in collections
+
+  requestBody:
+    # User DTO
+    CreateUserDto:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - username
+        - password
+        - confirmPassword
+      properties:
+        firstName:
+          type: string
+          description: first name of the user
+        lastName:
+          type: string
+          description: last name of the user
+        email:
+          type: string
+          description: email of the user
+        username:
+          type: string
+          description: username of the user
+        password:
+          type: string
+          description: password of the user
+        confirmPassword:
+          type: string
+          description: confirm password of the user
+        avatar:
+          type: string
+          description: avatar of the user
+          format: binary
+    UpdateUserDto:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - username
+        - password
+        - confirmPassword
+      properties:
+        firstName:
+          type: string
+          description: first name of the user
+        lastName:
+          type: string
+          description: last name of the user
+        email:
+          type: string
+          description: email of the user
+        username:
+          type: string
+          description: username of the user
+        phone:
+          type: string
+          description: phone of the user
+        password:
+          type: string
+          description: password of the user
+        avatar:
+          type: string
+          format: binary
+          description: avatar of the user
+        address:
+          type: string
+          description: address of the user
+        refreshToken:
+          type: string
+          description: refresh token of the user
+    LoginDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: username or email of the user
+        password:
+          type: string
+          description: password of the user
+
+  schemas:
+    User:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - username
+        - password
+      properties:
+        firstName:
+          type: string
+          description: first name of the user
+        lastName:
+          type: string
+          description: last name of the user
+        email:
+          type: string
+          description: email of the user
+        username:
+          type: string
+          description: username of the user
+        phone:
+          type: string
+          description: phone of the user
+        password:
+          type: string
+          description: password of the user
+        avatar:
+          type: string
+          description: avatar of the user
+        address:
+          type: string
+          description: address of the user
+        refreshToken:
+          type: string
+          description: refresh token of the user
+        roles:
+          type: array
+          description: roles of the user
+          items:
+            type: Role
+        conversations:
+          type: array
+          description: conversation of the user
+          items:
+            type: Conversation
+
+    Role:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: name of the role
+
+    Conversation:
+      type: object
+      required:
+        - name
+        - type
+        - owner
+        - members
+      properties:
+        name:
+          type: string
+          description: name of the conversation
+        avatar:
+          type: string
+          description: avatar of the conversation
+        type:
+          type: enum ['private', 'group']
+          description: type of the role
+        owner:
+          type: User
+          description: owner of the role
+        members:
+          type: array
+          description: members of the role
+          items:
+            type: User
+
+    Message:
+      type: object
+      required:
+        - sender
+        - conversation
+      properties:
+        sender:
+          type: User
+          description: sender of the message
+        conversation:
+          type: Conversation
+          description: conversation of the message
+        text:
+          type: string
+          description: text of the message
+        file:
+          type: string
+          description: file of the message
+        parent:
+          type: Message
+          description: reply message of the message
+        recallAt:
+          type: date
+          description: recall time of the message
+
+    MessageRecipient:
+      type: object
+      required:
+        - message
+        - recipient
+      properties:
+        message:
+          type: Message
+          description: message of the recipient
+        recipient:
+          type: User
+          description: recipient of the recipient
+        readAt:
+          type: date
+          description: read time of the recipient
+
+    Friend:
+      type: object
+      required:
+        - sender
+        - receiver
+      properties:
+        sender:
+          type: User
+          description: sender friend request
+        receiver:
+          type: User
+          description: receiver friend request
+        status:
+          type: enum ['pending', 'accepted', 'rejected']
+          description: status of the friend
+
+    Notification:
+      type: object
+      required:
+        - sender
+        - recipient
+        - type
+        - content
+      properties:
+        sender:
+          type: User
+          description: sender of the notification
+        recipient:
+          type: User
+          description: recipient of the notification
+        type:
+          type: enum ['friend_request', 'message', 'join_group']
+          description: type of the notification
+        content:
+          type: string
+          description: message of the notification
+        thumbnail:
+          type: string
+          description: thumbnail of the notification
+        readAt:
+          type: date
+          description: read time of the notification
