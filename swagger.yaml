@@ -149,11 +149,61 @@ paths:
       tags:
         - users
       summary: Update User By Id
+      parameters:
+        - name: id
+          in: path
+          description: User Id
+          required: true
       requestBody:
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/requestBody/UpdateUserDto'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # [PATCH] users/id/change-password
+  /api/users/{id}/change-password:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Change Password User By Id
+      parameters:
+        - name: id
+          in: path
+          description: User Id
+          required: true
+          schema:
+            type: string
+            format: objectId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+                - confirmNewPassword
+              properties:
+                currentPassword:
+                  type: string
+                  description: current password of the user
+                newPassword:
+                  type: string
+                  description: new password of the user
+                confirmNewPassword:
+                  type: string
+                  description: confirm new password of the user
       responses:
         200:
           description: 'OK'

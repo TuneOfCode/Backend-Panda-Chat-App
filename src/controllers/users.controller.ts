@@ -1,10 +1,11 @@
 import { connectToRedis } from '@/cache';
 import UsersFilter from '@/filters/users.filter';
+import { RequestWithUser } from '@/interfaces/auth.interface';
 import { ICacheUserKey } from '@/interfaces/caches.interface';
 import { IParameter, RequestWithQuery, SortType } from '@/interfaces/parameters.interface';
 import { logger } from '@/utils/logger';
 import { delCache, setCache } from '@/utils/util';
-import { CreateUserDto } from '@dtos/users.dto';
+import { ChangePasswordDto, CreateUserDto } from '@dtos/users.dto';
 import { IUser } from '@interfaces/users.interface';
 import { default as UsersService, default as usersService } from '@services/users.service';
 import { NextFunction, Request, Response } from 'express';
@@ -26,9 +27,9 @@ class UsersController {
 
       const findAllUsersData: IUser[] = await this.userService.findAllUser(params);
 
-      // // add cache data
-      // this.cacheKeys.getUsers = req.originalUrl || req.url;
-      // await setCache(this.cacheKeys.getUsers, findAllUsersData);
+      // add cache data
+      this.cacheKeys.getUsers = req.originalUrl || req.url;
+      await setCache(this.cacheKeys.getUsers, findAllUsersData);
 
       res.status(200).json({ data: findAllUsersData, message: 'findAll' });
     } catch (error) {
@@ -75,6 +76,21 @@ class UsersController {
       await delCache([this.cacheKeys.getUsers, this.cacheKeys.getUserById]);
 
       res.status(200).json({ data: updateUserData, message: 'updated' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public changePassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const userId: string = req.params.id;
+      const userData: ChangePasswordDto = req.body;
+      const updateUserData: IUser = await this.userService.changePassword(req.user, userId, userData);
+
+      // remove cache data
+      await delCache([this.cacheKeys.getUsers, this.cacheKeys.getUserById]);
+
+      res.status(200).json({ data: updateUserData, message: 'changed password' });
     } catch (error) {
       next(error);
     }

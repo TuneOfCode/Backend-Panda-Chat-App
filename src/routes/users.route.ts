@@ -1,6 +1,7 @@
+import authMiddleware from '@/middlewares/auth.middleware';
 import queryMiddleware from '@/middlewares/query.middleware';
 import UsersController from '@controllers/users.controller';
-import { CreateUserDto } from '@dtos/users.dto';
+import { ChangePasswordDto, CreateUserDto } from '@dtos/users.dto';
 import { IRoutes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import { Router } from 'express';
@@ -17,9 +18,15 @@ class UsersRoute implements IRoutes {
   private initializeRoutes() {
     this.router.get(`${this.path}`, queryMiddleware, this.usersController.getUsers);
     this.router.get(`${this.path}/:id`, this.usersController.getUserById);
-    this.router.post(`${this.path}`, validationMiddleware(CreateUserDto, 'body'), this.usersController.createUser);
-    this.router.put(`${this.path}/:id`, validationMiddleware(CreateUserDto, 'body', true), this.usersController.updateUser);
-    this.router.delete(`${this.path}/:id`, this.usersController.deleteUser);
+    this.router.post(`${this.path}`, authMiddleware, validationMiddleware(CreateUserDto, 'body'), this.usersController.createUser);
+    this.router.put(`${this.path}/:id`, authMiddleware, validationMiddleware(CreateUserDto, 'body', true), this.usersController.updateUser);
+    this.router.patch(
+      `${this.path}/:id/change-password`,
+      authMiddleware,
+      validationMiddleware(ChangePasswordDto, 'body', true),
+      this.usersController.changePassword,
+    );
+    this.router.delete(`${this.path}/:id`, authMiddleware, this.usersController.deleteUser);
   }
 }
 

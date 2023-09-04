@@ -54,3 +54,20 @@ export class UpdateUserDto extends CreateUserDto {
   @IsNotEmpty()
   public refreshToken: string;
 }
+
+export class ChangePasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  public currentPassword: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(6)
+  public newPassword: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(6)
+  @Match('newPassword')
+  public confirmNewPassword: string;
+}

@@ -84,7 +84,7 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
     this.app.use(express.static(uploadConst.SAVE_PLACES.ROOT));
-    // this.app.use(cacheMiddleware);
+    this.app.use(cacheMiddleware);
   }
 
   private initializeRoutes(routes: IRoutes[]) {
