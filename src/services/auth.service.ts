@@ -7,7 +7,7 @@ import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { IUser } from '@interfaces/users.interface';
 import userModel from '@models/users.model';
 import { isEmpty } from '@utils/util';
-import { LoginDto } from '@/dtos/auth.dto';
+import { LoginDto, RefreshTokenDto } from '@/dtos/auth.dto';
 import { logger } from '@/utils/logger';
 
 class AuthService {
@@ -40,6 +40,9 @@ class AuthService {
     const tokenData = this.createToken(findUser);
     const cookie = this.createCookie(tokenData);
 
+    // save refresh token in database
+    await this.users.findByIdAndUpdate(findUser._id, { refreshToken: tokenData.refreshToken });
+
     return { cookie, findUser, tokenData };
   }
 
@@ -56,12 +59,28 @@ class AuthService {
     const dataStoredInToken: DataStoredInToken = { _id: user._id };
     const secretKey: string = SECRET_KEY;
     const expiresIn: number = 60 * 60; // an hour
+    const refreshToken: string = `${Date.now()}_${Math.random().toString(18).substring(2)}`;
 
-    return { expiresIn, token: sign(dataStoredInToken, secretKey, { expiresIn }) };
+    return { expiresIn, token: sign(dataStoredInToken, secretKey, { expiresIn }), refreshToken };
   }
 
   public createCookie(tokenData: TokenData): string {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
+  }
+
+  public async refreshToken(token: RefreshTokenDto) {
+    if (isEmpty(token)) throw new HttpException(400, 'Token is empty');
+
+    const findUser: IUser = await this.users.findOne({ refreshToken: token.refreshToken });
+    if (!findUser) throw new HttpException(409, `This token ${token.refreshToken} was not found`);
+
+    const tokenData = this.createToken(findUser);
+    const cookie = this.createCookie(tokenData);
+
+    // save refresh token in database
+    await this.users.findByIdAndUpdate(findUser._id, { refreshToken: tokenData.refreshToken });
+
+    return { findUser, cookie, tokenData };
   }
 }
 

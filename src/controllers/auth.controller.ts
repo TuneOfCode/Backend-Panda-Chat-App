@@ -1,6 +1,6 @@
 import { HOST_UPLOAD } from '@/config';
 import { uploadConst } from '@/constants';
-import { LoginDto } from '@/dtos/auth.dto';
+import { LoginDto, RefreshTokenDto } from '@/dtos/auth.dto';
 import { CreateUserDto } from '@dtos/users.dto';
 import { RequestWithUser } from '@interfaces/auth.interface';
 import { IUser } from '@interfaces/users.interface';
@@ -42,7 +42,7 @@ class AuthController {
       const { cookie, findUser, tokenData } = await this.authService.login(userData);
 
       res.setHeader('Set-Cookie', [cookie]);
-      res.status(200).json({ data: findUser, message: 'login', meta: tokenData });
+      res.status(200).json({ data: findUser, meta: tokenData, message: 'login' });
     } catch (error) {
       next(error);
     }
@@ -55,6 +55,18 @@ class AuthController {
 
       res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
       res.status(200).json({ data: logOutUserData, message: 'logout' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token: RefreshTokenDto = req.body;
+      const { cookie, findUser, tokenData } = await this.authService.refreshToken(token);
+
+      res.setHeader('Set-Cookie', [cookie]);
+      res.status(200).json({ data: findUser, meta: tokenData, message: 'refreshed token' });
     } catch (error) {
       next(error);
     }
