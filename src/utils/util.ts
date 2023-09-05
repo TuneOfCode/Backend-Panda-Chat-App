@@ -76,12 +76,12 @@ export const getCache = async (key: string) => {
 export const delCache = async (keys: string[]) => {
   const client = await connectToRedis();
 
-  keys.forEach(async key => {
-    if (key) {
+  for (const key of keys) {
+    if (!isEmpty(key)) {
       await client.del(key);
-      logger.info(`delete cache key: ${key}`);
+      logger.info(`Redis client delete key: ${key}`);
     }
-  });
+  }
 
   // await client.disconnect().then(() => {
   //   logger.info('Redis client disconnected in delCache');

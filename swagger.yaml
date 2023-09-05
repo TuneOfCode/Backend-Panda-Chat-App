@@ -264,6 +264,145 @@ paths:
         500:
           description: 'Server Error'
 
+  # /api/roles
+  /api/roles:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - roles
+      summary: Find All Roles
+      parameters:
+        - $ref: '#/components/parameters/filter_field'
+        - $ref: '#/components/parameters/filter_operator'
+        - $ref: '#/components/parameters/filter_value'
+        - $ref: '#/components/parameters/sort_field'
+        - $ref: '#/components/parameters/sort_type'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        200:
+          description: 'OK'
+        500:
+          description: 'Server Error'
+
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - roles
+      summary: Add new a role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: name of the role
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/roles/id
+  /api/roles/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - roles
+      summary: Find Role By Id
+      parameters:
+        - name: id
+          in: path
+          description: Role Id
+          required: true
+      responses:
+        200:
+          description: 'OK'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - roles
+      summary: Update Role By Id
+      parameters:
+        - name: id
+          in: path
+          description: Role Id
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: name of the role
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # api/roles/id/asign
+  /api/roles/{id}/assign:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - roles
+      summary: Assign Role By Id
+      parameters:
+        - name: id
+          in: path
+          description: Role Id
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userIds
+              properties:
+                userIds:
+                  type: array
+                  description: array user ids of the role
+                  items:
+                    type: string
+                    format: objectId
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
 # components
 components:
   securitySchemes:
