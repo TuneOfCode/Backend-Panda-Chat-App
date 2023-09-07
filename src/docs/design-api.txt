@@ -19,6 +19,8 @@
     POST /api/auth/verify-otp (plus)
     POST /api/auth/logout
     POST /api/auth/refresh-token
+    PATCH /api/auth/change-password
+    PATCH /api/auth/update-me
 
 * Users:
     POST /api/users
@@ -33,6 +35,7 @@
     POST /api/roles
     GET /api/roles
     PATCH /api/roles/:id/assign -> gán vai trò cho nhiều người dùng
+    PATCH /api/roles/:id/unassign
     DELETE /api/roles/:id
 
 * Friends:

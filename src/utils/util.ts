@@ -87,3 +87,15 @@ export const delCache = async (keys: string[]) => {
   //   logger.info('Redis client disconnected in delCache');
   // });
 };
+/**
+ *
+ * @returns {Promise<void>}
+ * @description all keys in redis cache
+ */
+export const getAllKeys = async () => {
+  const client = await connectToRedis();
+
+  const keys = await client.keys('*');
+  console.log('all keys in cache:', keys);
+  return keys;
+};

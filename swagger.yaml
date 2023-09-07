@@ -161,13 +161,12 @@ paths:
         - users
       summary: Find User By Id
       parameters:
-        - name: id
-          in: path
-          description: User Id
-          required: true
+        - $ref: '#/components/parameters/id'
       responses:
         200:
           description: 'OK'
+        400:
+          description: 'Bad Request'
         409:
           description: 'Conflict'
         500:
@@ -181,10 +180,7 @@ paths:
         - users
       summary: Update User By Id
       parameters:
-        - name: id
-          in: path
-          description: User Id
-          required: true
+        - $ref: '#/components/parameters/id'
       requestBody:
         content:
           multipart/form-data:
@@ -207,10 +203,7 @@ paths:
         - users
       summary: Delete User By Id
       parameters:
-        - name: id
-          in: path
-          description: user Id
-          required: true
+        - $ref: '#/components/parameters/id'
       responses:
         200:
           description: 'OK'
@@ -228,13 +221,7 @@ paths:
         - users
       summary: Change Password User By Id
       parameters:
-        - name: id
-          in: path
-          description: User Id
-          required: true
-          schema:
-            type: string
-            format: objectId
+        - $ref: '#/components/parameters/id'
       requestBody:
         content:
           application/json:
@@ -322,10 +309,7 @@ paths:
         - roles
       summary: Find Role By Id
       parameters:
-        - name: id
-          in: path
-          description: Role Id
-          required: true
+        - $ref: '#/components/parameters/id'
       responses:
         200:
           description: 'OK'
@@ -341,10 +325,7 @@ paths:
         - roles
       summary: Update Role By Id
       parameters:
-        - name: id
-          in: path
-          description: Role Id
-          required: true
+        - $ref: '#/components/parameters/id'
       requestBody:
         content:
           application/json:
@@ -366,7 +347,7 @@ paths:
         500:
           description: 'Server Error'
 
-  # api/roles/id/asign
+  # api/roles/{id}/assign
   /api/roles/{id}/assign:
     patch:
       security:
@@ -375,10 +356,41 @@ paths:
         - roles
       summary: Assign Role By Id
       parameters:
-        - name: id
-          in: path
-          description: Role Id
-          required: true
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userIds
+              properties:
+                userIds:
+                  type: array
+                  description: array user ids of the role
+                  items:
+                    type: string
+                    format: objectId
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # api/roles/{id}/unassign
+  /api/roles/{id}/unassign:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - roles
+      summary: Unassign Role By Id
+      parameters:
+        - $ref: '#/components/parameters/id'
       requestBody:
         content:
           application/json:
@@ -411,6 +423,14 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    # Path Id
+    id:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: objectId
     # Filter
     filter_field:
       in: query

@@ -1,10 +1,7 @@
-import { connectToRedis } from '@/cache';
 import UsersFilter from '@/filters/users.filter';
 import { RequestWithUser } from '@/interfaces/auth.interface';
-import { ICacheUserKey } from '@/interfaces/caches.interface';
-import { IParameter, RequestWithQuery, SortType } from '@/interfaces/parameters.interface';
-import { logger } from '@/utils/logger';
-import { delCache, setCache } from '@/utils/util';
+import { IParameter, RequestWithQuery } from '@/interfaces/parameters.interface';
+import { delCache, getAllKeys, setCache } from '@/utils/util';
 import { ChangePasswordDto, CreateUserDto } from '@dtos/users.dto';
 import { IUser } from '@interfaces/users.interface';
 import { default as UsersService, default as usersService } from '@services/users.service';
@@ -12,10 +9,6 @@ import { NextFunction, Request, Response } from 'express';
 
 class UsersController {
   private readonly userService: UsersService = new usersService();
-  public cacheKeys: ICacheUserKey = {
-    getUsers: '',
-    getUserById: '',
-  };
 
   public getUsers = async (req: RequestWithQuery, res: Response, next: NextFunction) => {
     try {
@@ -28,8 +21,7 @@ class UsersController {
       const findAllUsersData: IUser[] = await this.userService.findAllUser(params);
 
       // add cache data
-      this.cacheKeys.getUsers = req.originalUrl || req.url;
-      await setCache(this.cacheKeys.getUsers, findAllUsersData);
+      await setCache(req.originalUrl, findAllUsersData);
 
       res.status(200).json({ data: findAllUsersData, message: 'findAll' });
     } catch (error) {
@@ -43,8 +35,7 @@ class UsersController {
       const findOneUserData: IUser = await this.userService.findUserById(userId);
 
       // add cache data
-      this.cacheKeys.getUserById = req.originalUrl || req.url;
-      await setCache(this.cacheKeys.getUserById, findOneUserData);
+      await setCache(req.originalUrl, findOneUserData);
 
       res.status(200).json({ data: findOneUserData, message: 'findOne' });
     } catch (error) {
@@ -58,7 +49,10 @@ class UsersController {
       const createUserData: IUser = await this.userService.createUser(userData);
 
       // remove cache data
-      await delCache([this.cacheKeys.getUsers, this.cacheKeys.getUserById]);
+      const keys = await getAllKeys();
+      const deletedKeys = keys.filter(key => key.includes('users'));
+      console.log('===> keys is deleted in create user:', deletedKeys);
+      await delCache(deletedKeys);
 
       res.status(201).json({ data: createUserData, message: 'created' });
     } catch (error) {
@@ -73,7 +67,11 @@ class UsersController {
       const updateUserData: IUser = await this.userService.updateUser(userId, userData);
 
       // remove cache data
-      await delCache([this.cacheKeys.getUsers, this.cacheKeys.getUserById]);
+      // remove cache data
+      const keys = await getAllKeys();
+      const deletedKeys = keys.filter(key => key.includes('users'));
+      console.log('===> keys is deleted in update user:', deletedKeys);
+      await delCache(deletedKeys);
 
       res.status(200).json({ data: updateUserData, message: 'updated' });
     } catch (error) {
@@ -88,7 +86,10 @@ class UsersController {
       const updateUserData: IUser = await this.userService.changePassword(req.user, userId, userData);
 
       // remove cache data
-      await delCache([this.cacheKeys.getUsers, this.cacheKeys.getUserById]);
+      const keys = await getAllKeys();
+      const deletedKeys = keys.filter(key => key.includes('users'));
+      console.log('===> keys is deleted in change password:', deletedKeys);
+      await delCache(deletedKeys);
 
       res.status(200).json({ data: updateUserData, message: 'changed password' });
     } catch (error) {
@@ -102,8 +103,10 @@ class UsersController {
       const deleteUserData: IUser = await this.userService.deleteUser(userId);
 
       // remove cache data
-      logger.info('delete cache ....');
-      await delCache([this.cacheKeys.getUsers, this.cacheKeys.getUserById]);
+      const keys = await getAllKeys();
+      const deletedKeys = keys.filter(key => key.includes('users'));
+      console.log('===> keys is deleted in delete user:', deletedKeys);
+      await delCache(deletedKeys);
 
       res.status(200).json({ data: deleteUserData, message: 'deleted' });
     } catch (error) {

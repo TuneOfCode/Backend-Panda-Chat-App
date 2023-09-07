@@ -17,3 +17,9 @@ export class AssignRoleDto {
   @IsNotEmpty()
   public userIds: string[];
 }
+
+export class UnassignRoleDto {
+  @IsArray()
+  @IsNotEmpty()
+  public userIds: string[];
+}
