@@ -138,7 +138,7 @@ paths:
         - bearerAuth: []
       tags:
         - users
-      summary: Add new a user
+      summary: Add new a user [ADMIN]
       requestBody:
         content:
           multipart/form-data:
@@ -178,7 +178,7 @@ paths:
         - bearerAuth: []
       tags:
         - users
-      summary: Update User By Id
+      summary: Update User By Id [ADMIN]
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
@@ -201,7 +201,7 @@ paths:
         - bearerAuth: []
       tags:
         - users
-      summary: Delete User By Id
+      summary: Delete User By Id [ADMIN]
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -258,7 +258,7 @@ paths:
         - bearerAuth: []
       tags:
         - roles
-      summary: Find All Roles
+      summary: Find All Roles [ADMIN]
       parameters:
         - $ref: '#/components/parameters/filter_field'
         - $ref: '#/components/parameters/filter_operator'
@@ -278,7 +278,7 @@ paths:
         - bearerAuth: []
       tags:
         - roles
-      summary: Add new a role
+      summary: Add new a role [ADMIN]
       requestBody:
         content:
           application/json:
@@ -307,7 +307,7 @@ paths:
         - bearerAuth: []
       tags:
         - roles
-      summary: Find Role By Id
+      summary: Find Role By Id [ADMIN]
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -323,7 +323,7 @@ paths:
         - bearerAuth: []
       tags:
         - roles
-      summary: Update Role By Id
+      summary: Update Role By Id [ADMIN]
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
@@ -354,7 +354,7 @@ paths:
         - bearerAuth: []
       tags:
         - roles
-      summary: Assign Role By Id
+      summary: Assign Role By Id [ADMIN]
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
@@ -388,7 +388,7 @@ paths:
         - bearerAuth: []
       tags:
         - roles
-      summary: Unassign Role By Id
+      summary: Unassign Role By Id [ADMIN]
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:

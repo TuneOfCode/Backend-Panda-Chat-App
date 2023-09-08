@@ -5,3 +5,9 @@ export interface IRole extends IBase {
   name: string;
   users?: IUser[];
 }
+
+export enum RoleType {
+  ADMIN = 'admin',
+  MEMBER = 'member',
+  GUEST = 'guest',
+}

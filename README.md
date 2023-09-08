@@ -1,6 +1,6 @@
-# Express + Typescript + Mongoose
+# Express + Typescript + Mongoose + Redis
 
-A Nodejs app using Express, Typescript, Mongoose
+Panda Chat Application using Express, Typescript, Mongoose, Redis
 
 ## Installation
 
@@ -25,6 +25,14 @@ This will start the project and you can access it in your browser at http://loca
 If you need to configure any settings for this project, you can do so by modifying the `src/config/index.js` file.
 and copy file .env.example to .env
 
+## Docker
+
+To start the project via docker, you can use the following command:
+`docker compose up -d`
+
+To watch the project via docker, you can use the following command:
+`docker compose logs -f`
+
 ## Contributing
 
 If you'd like to contribute to this project, you can fork the repository and submit a pull request.
@@ -35,4 +43,4 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 ## Contact
 
-If you have any questions or comments about this project, you can contact me at hongquandev@gmail.com
+If you have any questions or comments about this project, you can contact me at kingproup1111@gmail.com
