@@ -415,6 +415,199 @@ paths:
         500:
           description: 'Server Error'
 
+  # /api/friends
+  /api/friends:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Find All Friends
+      parameters:
+        - $ref: '#/components/parameters/search_friends'
+        - $ref: '#/components/parameters/filter_status_friends'
+        - $ref: '#/components/parameters/filter_sender_friends'
+        - $ref: '#/components/parameters/filter_receiver_friends'
+        - $ref: '#/components/parameters/sort_field'
+        - $ref: '#/components/parameters/sort_type'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        200:
+          description: 'OK'
+        500:
+          description: 'Server Error'
+
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Add new a friend request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - receiverId
+              properties:
+                receiverId:
+                  type: string
+                  format: objectId
+                  description: receiver id of the friend request
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/friends/{id}
+  /api/friends/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Find Friend By Id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Delete Friend By Id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/friends/{id}/accept
+  /api/friends/{id}/accept:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Accept friend request
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/friends/{id}/reject
+  /api/friends/{id}/reject:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Reject friend request
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/friends/{id}/cancel
+  /api/friends/{id}/cancel:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Cancel friend request
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/friends/{id}/unfriend
+  /api/friends/{id}/unfriend:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - friends
+      summary: Unfriend friend request
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
 # components
 components:
   securitySchemes:
@@ -469,6 +662,28 @@ components:
       name: per_page
       type: number
       description: limit to paginate in collections
+    # Filter Status Friends
+    search_friends:
+      in: query
+      name: search
+      type: string
+      description: search in friends
+    filter_status_friends:
+      in: query
+      name: type
+      type: enum
+      format: ['pending', 'accepted', 'rejected']
+      description: filter type in friends include (pending, accepted, rejected)
+    filter_sender_friends:
+      in: query
+      name: sender
+      type: string
+      description: filter sender in friends include (me)
+    filter_receiver_friends:
+      in: query
+      name: receiver
+      type: string
+      description: filter sender in friends include (me)
 
   requestBody:
     # User DTO

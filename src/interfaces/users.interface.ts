@@ -15,4 +15,5 @@ export interface IUser extends IBase {
   refreshToken: string;
   roles?: IRole[];
   conversations?: IConversation[];
+  friends?: IUser[];
 }

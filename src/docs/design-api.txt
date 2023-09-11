@@ -54,6 +54,7 @@
     PATCH /api/friends/:id/accept -> đồng ý lời mời kết bạn (status: pending)
     PATCH /api/friends/:id/reject -> từ chối lời mời kết bạn (status: pending)
     PATCH /api/friends/:id/unfriend -> huỷ kết bạn (status: accepted)
+    PATCH /api/friends/:id/cancel -> huỷ bỏ lời mời kết bạn (xoá)
     DELETE /api/friends/:id -> xoá lời mời kết bạn (chỉ trạng thái rejected)
 
 * Conversations: (cuộc hội thoại riêng tư hoặc với nhóm)

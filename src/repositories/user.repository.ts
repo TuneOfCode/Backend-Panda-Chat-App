@@ -10,4 +10,42 @@ export default class UserRepository extends BaseRepository<IUser> {
   async findOneWithRelations(filter = {}): Promise<IUser | null> {
     return await this.model.findOne(filter).populate(['roles', 'conversations']).exec();
   }
+
+  async findAllFriendsOfMe(userId: string, search?: string): Promise<IUser> {
+    const findFriendsOfme: IUser = await this.model
+      .findById(userId)
+      .populate([
+        {
+          path: 'friends',
+          select: ['_id', 'firstName', 'lastName', 'username', 'email', 'avatar', 'phone', 'address'],
+        },
+      ])
+      .select(['_id', 'firstName', 'lastName', 'username', 'email', 'avatar', 'phone', 'address'])
+      .exec();
+
+    if (search) {
+      return await this.model
+        .findById(userId)
+        .populate([
+          {
+            path: 'friends',
+            match: {
+              $or: [
+                { firstName: { $regex: search, $options: 'i' } },
+                { lastName: { $regex: search, $options: 'i' } },
+                { username: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { phone: { $regex: search, $options: 'i' } },
+                { address: { $regex: search, $options: 'i' } },
+              ],
+            },
+            select: ['_id', 'firstName', 'lastName', 'username', 'email', 'avatar', 'phone', 'address'],
+          },
+        ])
+        .select(['_id', 'firstName', 'lastName', 'username', 'email', 'avatar', 'phone', 'address'])
+        .exec();
+    }
+
+    return findFriendsOfme;
+  }
 }

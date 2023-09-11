@@ -9,7 +9,7 @@ export default class BaseRepository<T> implements IBaseRepository<T> {
     this.model = model;
   }
 
-  async find(params?: IParameter): Promise<T[]> {
+  async find(params?: IParameter, populate?: any[]): Promise<T[]> {
     const filters = params?.filters || {};
     const sortField = params?.sort?.sort_field || 'createdAt';
     const sortType = params?.sort?.sort_type || SortType.DESC;
@@ -21,6 +21,7 @@ export default class BaseRepository<T> implements IBaseRepository<T> {
       .sort({ [sortField]: sortType || SortType.DESC })
       .skip((page - 1) * perPage)
       .limit(perPage)
+      .populate(populate)
       .exec();
   }
 

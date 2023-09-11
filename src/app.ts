@@ -14,9 +14,8 @@ import morgan from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { connectToRedis } from './cache';
-import createSeedUser from './seeds/user.seed';
-import cacheMiddleware from './middlewares/cache.middleware';
 import { uploadConst } from './constants';
+import createSeedUser from './seeds/user.seed';
 
 class App {
   public app: express.Application;
@@ -68,7 +67,6 @@ class App {
     try {
       logger.info('Starting seed...');
       await createSeedUser();
-      logger.info('Seed finished!');
     } catch (error) {
       logger.error(error);
     }
@@ -84,7 +82,6 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
     this.app.use(express.static(uploadConst.SAVE_PLACES.ROOT));
-    // this.app.use(cacheMiddleware);
   }
 
   private initializeRoutes(routes: IRoutes[]) {

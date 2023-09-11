@@ -61,6 +61,14 @@ export const userSchema: Schema = new Schema<IUser>(
         name: 'conversations',
       },
     ],
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: false,
+        name: 'friends',
+      },
+    ],
     deletedAt: {
       type: Schema.Types.Date,
       required: false,
