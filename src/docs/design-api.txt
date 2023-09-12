@@ -69,7 +69,6 @@
     GET /api/conversations -> lấy ra tất cả cuộc hội thoại của tôi
     GET /api/conversations?type=private -> lấy ra tất cả cuộc hội thoại riêng tư của tôi
     GET /api/conversations?type=group -> lấy ra tất cả cuộc hội thoại nhóm của tôi
-    GET /api/conversations?is_hide=true -> lấy ra tất cả cuộc hội thoại bị ẩn của tôi
     GET /api/conversations/:id -> lấy ra chi tiết một cuộc hội thoại của tôi
     GET /api/conversations/:id/messages -> lấy ra tất cả tin nhắn trong một cuộc hội thoại của tôi
     GET /api/conversations/:id/messages/:id/readed -> lấy ra tất cả thành viên đã đọc tin nhắn này
@@ -82,8 +81,6 @@
     PATCH /api/conversations/:id/kick-members -> loại thành viên ra cuộc hội thoại (owner)
     PATCH /api/conversations/:id/join -> đồng ý tham gia vào cuộc hội thoại
     PATCH /api/conversations/:id/leave -> rời cuộc hội thoại này
-    PATCH /api/conversations/:id/hide -> ẩn hội thoại này (owner)
-    PATCH /api/conversations/:id/show -> khôi phục hội thoại này (owner)
     DELETE /api/conversations/:id -> xoá vĩnh viễn cuộc hội thoại
 
 * Messages:

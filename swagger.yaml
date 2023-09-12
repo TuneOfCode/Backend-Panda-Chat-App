@@ -608,6 +608,250 @@ paths:
         500:
           description: 'Server Error'
 
+  # /api/conversations
+  /api/conversations:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Find all conversations of me
+      parameters:
+        - $ref: '#/components/parameters/search_conversations'
+        - $ref: '#/components/parameters/filter_type_conversations'
+        - $ref: '#/components/parameters/sort_field'
+        - $ref: '#/components/parameters/sort_type'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        200:
+          description: 'OK'
+        500:
+          description: 'Server Error'
+
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Add new a conversation
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - memberIds
+              properties:
+                name:
+                  type: string
+                  description: name of the conversation
+                avatar:
+                  type: string
+                  description: avatar of the conversation
+                  format: binary
+                memberIds:
+                  type: array
+                  description: members of the conversation
+                  items:
+                    type: string
+                    format: objectId
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/conversations/{id}
+  /api/conversations/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Find conversation by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Update conversation by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: name of the conversation
+                avatar:
+                  type: string
+                  description: avatar of the conversation
+                  format: binary
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Delete conversation by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/conversations/{id}/add-members
+  /api/conversations/{id}/add-members:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Add members to conversation by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - memberIds
+              properties:
+                memberIds:
+                  type: array
+                  description: members of the conversation
+                  items:
+                    type: string
+                    format: objectId
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/conversations/{id}/kick-members
+  /api/conversations/{id}/kick-members:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Kick members to conversation by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - memberIds
+              properties:
+                memberIds:
+                  type: array
+                  description: members of the conversation
+                  items:
+                    type: string
+                    format: objectId
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/conversations/{id}/leave
+  /api/conversations/{id}/leave:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Leave conversation by me
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
 # components
 components:
   securitySchemes:
@@ -662,7 +906,7 @@ components:
       name: per_page
       type: number
       description: limit to paginate in collections
-    # Filter Status Friends
+    # Filter Friends
     search_friends:
       in: query
       name: search
@@ -684,6 +928,18 @@ components:
       name: receiver
       type: string
       description: filter sender in friends include (me)
+    # Filter Conversations
+    search_conversations:
+      in: query
+      name: search
+      type: string
+      description: search in conversations
+    filter_type_conversations:
+      in: query
+      name: type
+      type: enum
+      format: ['private', 'group']
+      description: filter type in conversations include (private, group)
 
   requestBody:
     # User DTO

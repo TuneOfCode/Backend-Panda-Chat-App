@@ -1,23 +1,29 @@
+import { CreateConversationTypePrivateDto } from '@/dtos/conversations.dto';
 import { CreateFriendRequestDto } from '@/dtos/friends.dto';
 import { HttpException } from '@/exceptions/HttpException';
 import { FriendStatus, IFriend } from '@/interfaces/friends.interface';
 import { IParameter } from '@/interfaces/parameters.interface';
 import { IUser } from '@/interfaces/users.interface';
+import conversationModel from '@/models/conversations.model';
 import friendModel from '@/models/friends.model';
 import userModel from '@/models/users.model';
 import FriendRepository from '@/repositories/friend.repository';
 import UserRepository from '@/repositories/user.repository';
 import { isEmpty } from '@/utils/util';
+import ConversationsService from './conversations.service';
 
 class FriendsService {
   private readonly friends = friendModel;
   private readonly users = userModel;
+  private readonly conversations = conversationModel;
   private readonly friendRepository: FriendRepository;
   private readonly userRepository: UserRepository;
+  private readonly conversationService: ConversationsService;
 
   constructor() {
     this.friendRepository = new FriendRepository();
     this.userRepository = new UserRepository();
+    this.conversationService = new ConversationsService();
   }
 
   public async createFriendRequest(friendData: CreateFriendRequestDto): Promise<IFriend> {
@@ -132,8 +138,17 @@ class FriendsService {
       // add me is sender in friend's friend list of user is receiver
       await this.users.findByIdAndUpdate(friend.sender, { $push: { friends: userId } }, { new: true });
 
-      // create notification and send to receiver via socket
       // create conversation for sender and receiver
+      const findSender: IUser = await this.users.findById(friend.sender._id.toString());
+      const conversationData: CreateConversationTypePrivateDto = {
+        name: `${findSender.firstName} ${findSender.lastName}`,
+        ownerId: userId,
+        memberIds: [findSender._id.toString()],
+        avatar: findSender.avatar,
+      };
+      await this.conversationService.createConversationTypePrivate(userId, conversationData);
+
+      // create notification and send to receiver via socket
     }
 
     return friend;

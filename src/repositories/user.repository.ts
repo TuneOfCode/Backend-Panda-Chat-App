@@ -8,7 +8,33 @@ export default class UserRepository extends BaseRepository<IUser> {
   }
 
   async findOneWithRelations(filter = {}): Promise<IUser | null> {
-    return await this.model.findOne(filter).populate(['roles', 'conversations']).exec();
+    return await this.model
+      .findOne(filter)
+      .populate([
+        {
+          path: 'role',
+          select: ['_id', 'name'],
+        },
+        {
+          path: 'conversations',
+          select: ['_id', 'name', 'avatar', 'type', 'onwer', 'members'],
+          populate: [
+            {
+              path: 'onwer',
+              select: ['_id', 'firstName', 'lastName', 'username', 'email', 'avatar'],
+            },
+            {
+              path: 'members',
+              select: ['_id', 'firstName', 'lastName', 'username', 'email', 'avatar'],
+            },
+          ],
+        },
+        {
+          path: 'friends',
+          select: ['_id', 'firstName', 'lastName', 'username', 'email', 'avatar', 'phone', 'address'],
+        },
+      ])
+      .exec();
   }
 
   async findAllFriendsOfMe(userId: string, search?: string): Promise<IUser> {
