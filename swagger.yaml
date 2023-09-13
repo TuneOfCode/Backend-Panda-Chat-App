@@ -1123,6 +1123,138 @@ paths:
         500:
           description: 'Server Error'
 
+  # /api/notifications
+  /api/notifications:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - notifications
+      summary: Find all notifications of me
+      parameters:
+        - $ref: '#/components/parameters/filter_type_notifications'
+        - $ref: '#/components/parameters/sort_field'
+        - $ref: '#/components/parameters/sort_type'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        200:
+          description: 'Ok'
+        500:
+          description: 'Server Error'
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - notifications
+      summary: Create new a notification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - receiverId
+                - type
+                - content
+                - thumbnail
+              properties:
+                receiverId:
+                  type: string
+                  format: objectId
+                  description: receiver id of the notification
+                type:
+                  type: string
+                  description: type of the notification
+                content:
+                  type: string
+                  description: content of the notification
+                thumbnail:
+                  type: string
+                  description: thumbnail of the notification
+      responses:
+        201:
+          description: 'Created'
+        500:
+          description: 'Server Error'
+
+  # /api/notifications/{id}
+  /api/notifications/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - notifications
+      summary: Find one notification by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'Ok'
+        500:
+          description: 'Server Error'
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - notifications
+      summary: Update one notification by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                receiverId:
+                  type: string
+                  format: objectId
+                  description: receiver id of the notification
+                type:
+                  type: string
+                  description: type of the notification
+                content:
+                  type: string
+                  description: content of the notification
+                thumbnail:
+                  type: string
+                  description: thumbnail of the notification
+      responses:
+        200:
+          description: 'Ok'
+        500:
+          description: 'Server Error'
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - notifications
+      summary: Delete one notification by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'Ok'
+        500:
+          description: 'Server Error'
+
+  # /api/notifications/{id}/read
+  /api/notifications/{id}/read:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - notifications
+      summary: Read a or all notifications of me
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'Ok'
+        500:
+          description: 'Server Error'
+
 # components
 components:
   securitySchemes:
@@ -1211,6 +1343,13 @@ components:
       type: enum
       format: ['private', 'group']
       description: filter type in conversations include (private, group)
+    # Filter Notifications
+    filter_type_notifications:
+      in: query
+      name: type
+      type: enum
+      format: ['friend_request', 'message', 'system']
+      description: filter type in notifications include (friend_request, message, system)
 
   requestBody:
     # User DTO

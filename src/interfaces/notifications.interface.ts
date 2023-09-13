@@ -3,8 +3,9 @@ import { IUser } from './users.interface';
 
 export enum NotificationType {
   FRIEND_REQUEST = 'friend_request',
-  JOIN_GROUP = 'join_group',
+  // JOIN_GROUP = 'join_group',
   MESSAGE = 'message',
+  SYSTEM = 'system',
 }
 
 export interface INotification extends IBase {

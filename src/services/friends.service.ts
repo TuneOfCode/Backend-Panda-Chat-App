@@ -11,19 +11,26 @@ import FriendRepository from '@/repositories/friend.repository';
 import UserRepository from '@/repositories/user.repository';
 import { isEmpty } from '@/utils/util';
 import ConversationsService from './conversations.service';
+import NotificationsService from './notifications.service';
+import { INotification, NotificationType } from '@/interfaces/notifications.interface';
+import { CreateNotificationDto } from '@/dtos/notifications.dto';
+import notificationModel from '@/models/notifications.model';
 
 class FriendsService {
   private readonly friends = friendModel;
   private readonly users = userModel;
   private readonly conversations = conversationModel;
+  private readonly notifications = notificationModel;
   private readonly friendRepository: FriendRepository;
   private readonly userRepository: UserRepository;
   private readonly conversationService: ConversationsService;
+  private readonly notificationService: NotificationsService;
 
   constructor() {
     this.friendRepository = new FriendRepository();
     this.userRepository = new UserRepository();
     this.conversationService = new ConversationsService();
+    this.notificationService = new NotificationsService();
   }
 
   public async createFriendRequest(friendData: CreateFriendRequestDto): Promise<IFriend> {
@@ -68,6 +75,18 @@ class FriendsService {
 
     if (newFriendRequest) {
       // create notification and send to receiver via socket
+      const findSender: IUser = await this.userRepository.findById(friendData.senderId);
+      const notificationData: CreateNotificationDto = {
+        senderId: friendData.senderId,
+        recipientId: friendData.receiverId,
+        type: NotificationType.FRIEND_REQUEST,
+        content: `${findSender.firstName} ${findSender.lastName} đã gửi cho bạn lời mời kết bạn`,
+        thumbnail: findSender.avatar,
+      };
+
+      console.log('===> notificationData:::', notificationData);
+
+      await this.notificationService.createNotification(notificationData);
     }
 
     return newFriendRequest;
@@ -149,6 +168,24 @@ class FriendsService {
       await this.conversationService.createConversationTypePrivate(userId, conversationData);
 
       // create notification and send to receiver via socket
+      const findAndDeleteNotificationWithContentIsSentFriendRequest: INotification = await this.notifications.findOneAndDelete({
+        sender: friend.sender._id.toString(),
+        recipient: userId,
+        type: NotificationType.FRIEND_REQUEST,
+      });
+
+      if (findAndDeleteNotificationWithContentIsSentFriendRequest) {
+        const findRecipient: IUser = await this.users.findById(userId);
+        const notificationData: CreateNotificationDto = {
+          senderId: userId,
+          recipientId: findSender._id.toString(),
+          type: NotificationType.FRIEND_REQUEST,
+          content: `${findRecipient.firstName} ${findRecipient.lastName} đã chấp nhận lời mời kết bạn của bạn`,
+          thumbnail: findRecipient.avatar,
+        };
+
+        await this.notificationService.createNotification(notificationData);
+      }
     }
 
     return friend;
@@ -166,7 +203,17 @@ class FriendsService {
 
     if (!findFriendRequestIsPending) throw new HttpException(409, `This friend request is not exist`);
 
-    return await this.friends.findByIdAndUpdate(friendId, { status: FriendStatus.REJECTED }, { new: true });
+    const rejectFriendRequest: IFriend = await this.friends.findByIdAndUpdate(friendId, { status: FriendStatus.REJECTED }, { new: true });
+
+    if (rejectFriendRequest) {
+      await this.notifications.findOneAndDelete({
+        sender: rejectFriendRequest.receiver._id.toString(),
+        recipient: rejectFriendRequest.sender._id.toString(),
+        type: NotificationType.FRIEND_REQUEST,
+      });
+    }
+
+    return rejectFriendRequest;
   }
 
   public async cancelFriendRequest(userId: string, friendId: string): Promise<IFriend> {
@@ -185,6 +232,11 @@ class FriendsService {
 
     if (friendRequestIsCanceled) {
       // delete notification
+      await this.notifications.findOneAndDelete({
+        sender: friendRequestIsCanceled.receiver._id.toString(),
+        recipient: friendRequestIsCanceled.sender._id.toString(),
+        type: NotificationType.FRIEND_REQUEST,
+      });
     }
 
     return friendRequestIsCanceled;
@@ -216,6 +268,13 @@ class FriendsService {
 
       // remove me is receiver in friend's friend list of user is sender
       await this.users.findByIdAndUpdate(unfriend.receiver, { $pull: { friends: userId } }, { new: true });
+
+      // delete notification
+      await this.notifications.findOneAndDelete({
+        sender: unfriend.receiver._id.toString(),
+        recipient: unfriend.sender._id.toString(),
+        type: NotificationType.FRIEND_REQUEST,
+      });
     }
 
     return unfriend;

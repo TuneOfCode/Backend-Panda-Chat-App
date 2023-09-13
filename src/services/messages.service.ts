@@ -1,6 +1,6 @@
 import { CreateMessageDto, CreateMessageRecipientDto, UpdateMessageDto } from '@/dtos/messages.dto';
 import { HttpException } from '@/exceptions/HttpException';
-import { IConversation } from '@/interfaces/conversations.interface';
+import { ConversationType, IConversation } from '@/interfaces/conversations.interface';
 import { IMessageRecipient } from '@/interfaces/messageRecipients.interface';
 import { IMessage } from '@/interfaces/messages.interface';
 import conversationModel from '@/models/conversations.model';
@@ -10,19 +10,30 @@ import ConversationRepository from '@/repositories/conversation.repository';
 import MessageRepository from '@/repositories/message.repository';
 import MessageRecipientRepository from '@/repositories/messageRecipient.repository';
 import { isEmpty, isMongoObjectId } from '@/utils/util';
+import NotificationsService from './notifications.service';
+import notificationModel from '@/models/notifications.model';
+import { CreateNotificationDto } from '@/dtos/notifications.dto';
+import { INotification, NotificationType } from '@/interfaces/notifications.interface';
+import { send } from 'process';
+import { IUser } from '@/interfaces/users.interface';
+import userModel from '@/models/users.model';
 
 class MessagesService {
   private readonly messages = messageModel;
   private readonly messageRecipients = messageRecipientModel;
   private readonly conversations = conversationModel;
+  private readonly users = userModel;
+  private readonly notifications = notificationModel;
   private readonly messageRepository: MessageRepository;
   private readonly messageRecipientRepository: MessageRecipientRepository;
   private readonly conversationRepository: ConversationRepository;
+  private readonly notificationService: NotificationsService;
 
   constructor() {
     this.messageRepository = new MessageRepository();
     this.messageRecipientRepository = new MessageRecipientRepository();
     this.conversationRepository = new ConversationRepository();
+    this.notificationService = new NotificationsService();
   }
 
   public async createMessage(userId: string, messageData: CreateMessageDto): Promise<IMessage> {
@@ -62,9 +73,34 @@ class MessagesService {
             $push: { messageRecipients: newMessageRecipients._id },
           });
         }
-      }
 
-      // TODO: send message to socket
+        // send notification message is not read to members of conversation
+        const findSender: IUser = await this.users.findById(userId);
+        let conversationName: string = null;
+        let conversationAvatar: string = null;
+        if (findConversation.type === ConversationType.GROUP) {
+          conversationName = findConversation.name;
+          conversationAvatar = findConversation.avatar;
+        }
+
+        if (findConversation.type === ConversationType.PRIVATE) {
+          const findMember: IUser = findConversation.members.find(member => member._id.toString() === memberId);
+          conversationName = `${findMember.firstName} ${findMember.lastName}`;
+          conversationAvatar = findMember.avatar;
+        }
+
+        const notificationData: CreateNotificationDto = {
+          senderId: userId,
+          recipientId: memberId,
+          type: NotificationType.MESSAGE,
+          content: `${findSender.firstName} ${findSender.lastName} đã gửi tin nhắn mới cho bạn trong cuộc trò chuyện ${conversationName}`,
+          thumbnail: conversationAvatar,
+        };
+
+        await this.notificationService.createNotification(notificationData);
+
+        // TODO: send message to socket
+      }
     }
 
     return newMessage;
@@ -140,6 +176,27 @@ class MessagesService {
 
     if (findMessageRecipient) {
       await this.messageRecipients.findByIdAndUpdate(findMessageRecipient._id, { readedAt: new Date() });
+
+      // update notification
+      await this.notifications.findOneAndUpdate(
+        {
+          sender: findMessage.sender._id.toString(),
+          recipient: userId,
+          type: NotificationType.MESSAGE,
+        },
+        {
+          $set: { readedAt: new Date() },
+        },
+        { new: true, multi: true },
+      );
+
+      // // Delete notification
+      // await this.notifications.findOneAndDelete({
+      //   sender: findMessage.sender._id.toString(),
+      //   recipient: userId,
+      //   type: NotificationType.MESSAGE,
+      //   readedAt: { $ne: null },
+      // });
     }
 
     const readMessage: IMessage = await this.messageRepository.findDetailMessage(messageId);

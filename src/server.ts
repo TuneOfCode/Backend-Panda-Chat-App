@@ -7,6 +7,7 @@ import ConversationsRoute from './routes/conversations.route';
 import FriendsRoute from './routes/friends.route';
 import MessagesRoute from './routes/messages.route';
 import RolesRoute from './routes/roles.route';
+import NotificationsRoute from './routes/notifications.route';
 
 validateEnv();
 
@@ -18,6 +19,7 @@ const app = new App([
   new FriendsRoute(),
   new ConversationsRoute(),
   new MessagesRoute(),
+  new NotificationsRoute(),
 ]);
 
 app.listen();

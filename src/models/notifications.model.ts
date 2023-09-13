@@ -19,7 +19,7 @@ const notificationSchema: Schema = new Schema<INotification>(
       type: String,
       required: true,
       enum: NotificationType,
-      default: NotificationType.FRIEND_REQUEST,
+      default: NotificationType.SYSTEM,
     },
     content: {
       type: String,
@@ -27,7 +27,7 @@ const notificationSchema: Schema = new Schema<INotification>(
     },
     thumbnail: {
       type: String,
-      required: true,
+      required: false,
     },
     readedAt: {
       type: Schema.Types.Date,
