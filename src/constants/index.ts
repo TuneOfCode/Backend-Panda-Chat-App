@@ -26,10 +26,10 @@ export const uploadConst = {
     OTHER: 'src/public/others',
   },
   EXTENSIONS: {
-    IMAGE: ['jpg', 'jpeg', 'png', 'gif'],
+    IMAGE: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
     VIDEO: ['mp4', 'avi', 'mkv', 'mov'],
     OTHER: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
-    ALL: ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'avi', 'mkv', 'mov', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
+    ALL: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'mp4', 'avi', 'mkv', 'mov', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
   },
   MAX_COUNT: 5,
 };

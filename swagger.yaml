@@ -752,6 +752,59 @@ paths:
         500:
           description: 'Server Error'
 
+  # /api/conversations/{id}/messages
+  /api/conversations/{id}/messages:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Find all messages in conversation by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/search_conversations'
+        - $ref: '#/components/parameters/sort_field'
+        - $ref: '#/components/parameters/sort_type'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/per_page'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/conversations/{id}/last-message
+  /api/conversations/{id}/last-message:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - conversations
+      summary: Find last message in conversation by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
   # /api/conversations/{id}/add-members
   /api/conversations/{id}/add-members:
     patch:
@@ -841,6 +894,224 @@ paths:
       responses:
         200:
           description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/messages
+  /api/messages:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Find all messages is not readed of me
+      responses:
+        200:
+          description: 'OK'
+        500:
+          description: 'Server Error'
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Create new a message
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - conversationId
+              properties:
+                conversationId:
+                  type: string
+                  format: objectId
+                  description: conversation id of the message
+                text:
+                  type: string
+                  description: text of the message
+                files:
+                  type: array
+                  description: files of the message
+                  items:
+                    type: string
+                    format: binary
+                    description: file of the message
+                parentMessageId:
+                  type: string
+                  format: objectId
+                  description: reply message of the message
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/messages/{id}
+  /api/messages/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Find one message by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Update one message by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: text of the message
+                files:
+                  type: array
+                  description: files of the message
+                  items:
+                    type: string
+                    format: binary
+                    description: file of the message
+                parentMessageId:
+                  type: string
+                  format: objectId
+                  description: reply message of the message
+      responses:
+        200:
+          description: 'Ok'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Delete one message by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'Ok'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/messages/{id}/read
+  /api/messages/{id}/read:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Read message by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'Ok'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/messages/{id}/recall
+  /api/messages/{id}/recall:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Recall message by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'Ok'
+        400:
+          description: 'Bad Request'
+        401:
+          description: 'Unauthorized'
+        404:
+          description: 'Not Found'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+  # /api/messages/{id}/restore
+  /api/messages/{id}/restore:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - messages
+      summary: Restore message by id
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: 'Ok'
         400:
           description: 'Bad Request'
         401:

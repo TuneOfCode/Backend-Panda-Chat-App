@@ -1,23 +1,29 @@
 import { CreateConversationDto, CreateConversationTypePrivateDto, UpdateConversationDto } from '@/dtos/conversations.dto';
 import { HttpException } from '@/exceptions/HttpException';
 import { ConversationType, IConversation } from '@/interfaces/conversations.interface';
+import { IMessage } from '@/interfaces/messages.interface';
 import { IParameter } from '@/interfaces/parameters.interface';
 import { IUser } from '@/interfaces/users.interface';
 import conversationModel from '@/models/conversations.model';
+import messageModel from '@/models/messages.model';
 import userModel from '@/models/users.model';
 import ConversationRepository from '@/repositories/conversation.repository';
+import MessageRepository from '@/repositories/message.repository';
 import UserRepository from '@/repositories/user.repository';
 import { isEmpty } from '@/utils/util';
 
 class ConversationsService {
   private readonly conversations = conversationModel;
   private readonly users = userModel;
+  private readonly messages = messageModel;
   private readonly conversationRepository: ConversationRepository;
   private readonly userRepository: UserRepository;
+  private readonly messageRepository: MessageRepository;
 
   constructor() {
     this.conversationRepository = new ConversationRepository();
     this.userRepository = new UserRepository();
+    this.messageRepository = new MessageRepository();
   }
 
   public async createConversationTypePrivate(userId: string, conversationData: CreateConversationTypePrivateDto): Promise<IConversation> {
@@ -115,6 +121,35 @@ class ConversationsService {
   public async findAllConversationsIsSoftDeletedOfMe(userId: string, params: IParameter): Promise<IConversation[]> {
     const findConversations: IConversation[] = await this.conversationRepository.find(params);
     return findConversations;
+  }
+
+  public async findAllMessagesInConversation(conversationId: string, params?: IParameter): Promise<IMessage[]> {
+    let filters = {
+      conversation: conversationId,
+      // recalledAt: null, // if recalledAt is not null then show message: 'Tin nhắn đã bị thu hồi'
+      text: null,
+    };
+
+    if (!isEmpty(params.filters?.search)) {
+      filters = {
+        ...filters,
+        text: { $regex: params.filters?.search, $options: 'i' },
+      };
+    } else {
+      delete filters.text;
+    }
+
+    params.filters = filters;
+
+    return await this.messageRepository.findAllMessagesInConversation(params);
+  }
+
+  public async findLastMessageInConversation(conversationId: string): Promise<IMessage> {
+    const lastMessage: IMessage = await this.messageRepository.findLastMessageInConversation(conversationId);
+
+    if (!lastMessage) throw new HttpException(409, 'Message not found');
+
+    return lastMessage;
   }
 
   public async findConversationById(conversationId: string): Promise<IConversation> {

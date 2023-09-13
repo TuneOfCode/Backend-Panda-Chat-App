@@ -45,6 +45,11 @@ export const userSchema: Schema = new Schema<IUser>(
       type: String,
       require: false,
     },
+    offlineAt: {
+      type: Schema.Types.Date,
+      required: false,
+      default: null,
+    },
     roles: [
       {
         type: Schema.Types.ObjectId,

@@ -13,6 +13,7 @@ export interface IUser extends IBase {
   address: string;
   // verifiedEmail: boolean;
   refreshToken: string;
+  offlineAt?: Date; // last time user offline order to show online status. Ex: 1 minute ago
   roles?: IRole[];
   conversations?: IConversation[];
   friends?: IUser[];

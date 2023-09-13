@@ -3,6 +3,7 @@ import { uploadConst } from '@/constants';
 import { CreateConversationDto, UpdateConversationDto } from '@/dtos/conversations.dto';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import { IConversation } from '@/interfaces/conversations.interface';
+import { IMessage } from '@/interfaces/messages.interface';
 import { IParameter, RequestWithQuery } from '@/interfaces/parameters.interface';
 import ConversationsService from '@/services/conversations.service';
 import { NextFunction, Response } from 'express';
@@ -46,12 +47,23 @@ class ConversationsController {
           search: req.query.search,
           type: req.query.type,
         },
-        ...req.params,
+        ...req.queryParams,
       };
 
       const conversations: IConversation[] = await this.conversationsService.findAllConversationsOfMe(userId, params);
 
       res.status(200).json({ data: conversations, message: 'Find all convertions of me' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getLastMessageInConversation = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const conversationId: string = req.params.id;
+      const lastMessage: IMessage = await this.conversationsService.findLastMessageInConversation(conversationId);
+
+      res.status(200).json({ data: lastMessage, message: 'Find last message in conversation' });
     } catch (error) {
       next(error);
     }
@@ -63,6 +75,23 @@ class ConversationsController {
       const conversation: IConversation = await this.conversationsService.findConversationById(conversationId);
 
       res.status(200).json({ data: conversation, message: 'Find detail of a conversation' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAllMessagesById = async (req: RequestWithUser & RequestWithQuery, res: Response, next: NextFunction) => {
+    try {
+      const conversationId: string = req.params.id;
+      const params: IParameter = {
+        filters: {
+          search: req.query.search,
+        },
+        ...req.queryParams,
+      };
+
+      const messages: IMessage[] = await this.conversationsService.findAllMessagesInConversation(conversationId, params);
+      res.status(200).json({ data: messages, message: 'Find all messages in conversation' });
     } catch (error) {
       next(error);
     }

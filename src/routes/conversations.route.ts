@@ -28,8 +28,15 @@ class ConversationsRoute implements IRoutes {
       validationMiddleware(CreateConversationDto, 'body'),
       this.conversationsController.createConversation,
     );
+
     this.router.get(`${this.path}`, authMiddleware, queryMiddleware, this.conversationsController.getAllConversationsOfMe);
+
     this.router.get(`${this.path}/:id`, authMiddleware, this.conversationsController.getConversationById);
+
+    this.router.get(`${this.path}/:id/messages`, authMiddleware, queryMiddleware, this.conversationsController.getAllMessagesById);
+
+    this.router.get(`${this.path}/:id/last-message`, authMiddleware, this.conversationsController.getLastMessageInConversation);
+
     this.router.patch(
       `${this.path}/:id`,
       authMiddleware,
@@ -39,9 +46,15 @@ class ConversationsRoute implements IRoutes {
       validationMiddleware(UpdateConversationDto, 'body'),
       this.conversationsController.updateConversationById,
     );
+
+    this.router.patch(`${this.path}/:id/messages`, authMiddleware, queryMiddleware, this.conversationsController.getAllMessagesById);
+
     this.router.patch(`${this.path}/:id/add-members`, authMiddleware, this.conversationsController.addMembers);
+
     this.router.patch(`${this.path}/:id/kick-members`, authMiddleware, this.conversationsController.kickMembers);
+
     this.router.patch(`${this.path}/:id/leave`, authMiddleware, this.conversationsController.leaveConversation);
+
     this.router.delete(`${this.path}/:id`, authMiddleware, this.conversationsController.deleteConversationById);
   }
 }
