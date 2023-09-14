@@ -1,5 +1,4 @@
-import { hash, compare } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
+import { LoginDto, RefreshTokenDto, UpdateMeDto } from '@/dtos/auth.dto';
 import { SECRET_KEY } from '@config';
 import { CreateUserDto } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
@@ -7,8 +6,8 @@ import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { IUser } from '@interfaces/users.interface';
 import userModel from '@models/users.model';
 import { isEmpty } from '@utils/util';
-import { LoginDto, RefreshTokenDto } from '@/dtos/auth.dto';
-import { logger } from '@/utils/logger';
+import { compare, hash } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
 
 class AuthService {
   public users = userModel;
@@ -81,6 +80,29 @@ class AuthService {
     await this.users.findByIdAndUpdate(findUser._id, { refreshToken: tokenData.refreshToken });
 
     return { findUser, cookie, tokenData };
+  }
+
+  public async updateMe(userId: string, userData: UpdateMeDto) {
+    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
+
+    const findUser: IUser = await this.users.findById(userId);
+    if (!findUser) throw new HttpException(409, `This user was not found`);
+
+    const updateUserData: IUser = await this.users.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          firstName: !isEmpty(userData.firstName) ? userData.firstName : findUser.firstName,
+          lastName: !isEmpty(userData.lastName) ? userData.lastName : findUser.lastName,
+          phone: !isEmpty(userData.phone) ? userData.phone : findUser.phone,
+          address: !isEmpty(userData.address) ? userData.address : findUser.address,
+          avatar: !isEmpty(userData.avatar) ? userData.avatar : findUser.avatar,
+        },
+      },
+      { new: true },
+    );
+
+    return updateUserData;
   }
 }
 

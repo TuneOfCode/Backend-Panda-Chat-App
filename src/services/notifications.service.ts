@@ -62,11 +62,11 @@ class NotificationsService {
     const updateNotificationById: INotification = await this.notifications.findByIdAndUpdate(
       notificationId,
       {
-        sender: notificationData.senderId ?? findNotification.sender,
-        recipient: notificationData.recipientId ?? findNotification.recipient,
-        type: notificationData.type ?? findNotification.type,
-        content: notificationData.content ?? findNotification.content,
-        thumbnail: notificationData.thumbnail ?? findNotification.thumbnail,
+        sender: !isEmpty(notificationData.senderId) ? notificationData.senderId : findNotification.sender,
+        recipient: !isEmpty(notificationData.recipientId) ? notificationData.recipientId : findNotification.recipient,
+        type: !isEmpty(notificationData.type) ? notificationData.type : findNotification.type,
+        content: !isEmpty(notificationData.content) ? notificationData.content : findNotification.content,
+        thumbnail: !isEmpty(notificationData.thumbnail) ? notificationData.thumbnail : findNotification.thumbnail,
       },
       { new: true },
     );

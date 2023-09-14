@@ -19,7 +19,9 @@ class RolesRoute implements IRoutes {
 
   private initializeRoutes() {
     this.router.get(`${this.path}`, authMiddleware, authorizeMiddleware(RoleType.ADMIN), cacheMiddleware, this.rolesController.getRoles);
+
     this.router.get(`${this.path}/:id`, authMiddleware, authorizeMiddleware(RoleType.ADMIN), cacheMiddleware, this.rolesController.getRoleById);
+
     this.router.post(
       `${this.path}`,
       authMiddleware,
@@ -27,6 +29,7 @@ class RolesRoute implements IRoutes {
       validationMiddleware(CreateRoleDto, 'body'),
       this.rolesController.createRole,
     );
+
     this.router.patch(
       `${this.path}/:id/assign`,
       authMiddleware,
@@ -34,6 +37,7 @@ class RolesRoute implements IRoutes {
       validationMiddleware(AssignRoleDto, 'body', true),
       this.rolesController.assignRole,
     );
+
     this.router.patch(
       `${this.path}/:id/unassign`,
       authMiddleware,
@@ -41,6 +45,7 @@ class RolesRoute implements IRoutes {
       validationMiddleware(UnassignRoleDto, 'body', true),
       this.rolesController.unassignRole,
     );
+
     this.router.patch(
       `${this.path}/:id`,
       authMiddleware,

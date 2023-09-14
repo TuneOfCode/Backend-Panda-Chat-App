@@ -129,9 +129,10 @@ class MessagesService {
     if (isEmpty(messageData.text) && isEmpty(messageData.files)) throw new HttpException(400, 'Message content is empty');
 
     const editMessage: IMessage = await this.messages.findByIdAndUpdate(messageData.messageId, {
-      text: messageData.text ?? findMessage.text,
-      files: messageData.files ?? findMessage.files,
-      parent: isMongoObjectId(messageData.parentMessageId) ? messageData.parentMessageId : findMessage.parent,
+      text: !isEmpty(messageData.text) ? messageData.text : findMessage.text,
+      files: !isEmpty(messageData.files) ? messageData.files : findMessage.files,
+      parent:
+        isMongoObjectId(messageData.parentMessageId) && !isEmpty(messageData.parentMessageId) ? messageData.parentMessageId : findMessage.parent,
     });
 
     return editMessage;
@@ -144,8 +145,6 @@ class MessagesService {
     const findAllMessagesBeforeLastMessage: IMessage[] = await this.messageRepository.findAllMessagesBeforeLastMessageInConversation(
       findMessage.conversation._id.toString(),
     );
-
-    console.log('==> findAllMessagesBeforeLastMessage:::', findAllMessagesBeforeLastMessage);
 
     if (findAllMessagesBeforeLastMessage.length > 0) {
       for (const message of findAllMessagesBeforeLastMessage) {

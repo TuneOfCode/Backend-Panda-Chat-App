@@ -44,3 +44,20 @@ export class RefreshTokenDto {
   @IsNotEmpty()
   public refreshToken: string;
 }
+
+export class UpdateMeDto {
+  @IsOptional()
+  public firstName: string;
+
+  @IsOptional()
+  public lastName: string;
+
+  @IsOptional()
+  public phone: string;
+
+  @IsOptional()
+  public address: string;
+
+  @IsOptional()
+  public avatar: string;
+}

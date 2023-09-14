@@ -20,7 +20,9 @@ class UsersRoute implements IRoutes {
 
   private initializeRoutes() {
     this.router.get(`${this.path}`, queryMiddleware, cacheMiddleware, this.usersController.getUsers);
+
     this.router.get(`${this.path}/:id`, cacheMiddleware, this.usersController.getUserById);
+
     this.router.post(
       `${this.path}`,
       authMiddleware,
@@ -28,6 +30,7 @@ class UsersRoute implements IRoutes {
       validationMiddleware(CreateUserDto, 'body'),
       this.usersController.createUser,
     );
+
     this.router.put(
       `${this.path}/:id`,
       authMiddleware,
@@ -35,6 +38,7 @@ class UsersRoute implements IRoutes {
       validationMiddleware(CreateUserDto, 'body', true),
       this.usersController.updateUser,
     );
+
     this.router.patch(
       `${this.path}/:id/change-password`,
       authMiddleware,
@@ -42,6 +46,7 @@ class UsersRoute implements IRoutes {
       validationMiddleware(ChangePasswordDto, 'body', true),
       this.usersController.changePassword,
     );
+
     this.router.delete(`${this.path}/:id`, authMiddleware, authorizeMiddleware(RoleType.ADMIN), this.usersController.deleteUser);
   }
 }

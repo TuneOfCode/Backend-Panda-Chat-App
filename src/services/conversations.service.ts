@@ -169,8 +169,8 @@ class ConversationsService {
       conversationId,
       {
         $set: {
-          name: conversationData.name,
-          avatar: conversationData.avatar,
+          name: !isEmpty(conversationData.name) ? conversationData.name : findConversation.name,
+          avatar: !isEmpty(conversationData.avatar) ? conversationData.avatar : findConversation.avatar,
         },
       },
       { new: true },

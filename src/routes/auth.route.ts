@@ -33,6 +33,15 @@ class AuthRoute implements IRoutes {
     this.router.post(`${this.path}/logout`, authMiddleware, this.authController.logOut);
 
     this.router.post(`${this.path}/refresh-token`, authMiddleware, validationMiddleware(RefreshTokenDto, 'body'), this.authController.refreshToken);
+
+    this.router.patch(
+      `${this.path}/update-me`,
+      authMiddleware,
+      uploadMiddleware({
+        allowedExtType: UploadExtType.IMAGE,
+      }).single(uploadConst.FIELD_NAME.AVATAR),
+      this.authController.updateMe,
+    );
   }
 }
 
